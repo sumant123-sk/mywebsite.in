@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🤖 Mini Game Center</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1d1f27, #2c2f3a);
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #00e0ff;
+      text-shadow: 0 0 15px #00e0ff;
+    }
+    .game-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .game-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,255,255,0.2);
+      transition: 0.3s;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(0,255,255,0.5);
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #00e0ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    input {
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      margin: 10px 0;
+    }
+    canvas {
+      background: #444;
+      border-radius: 15px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎮 Play With Robot</h1>
+  <div class="game-container">
+    
+    <!-- Math Puzzle -->
+    <div class="game-card">
+      <h2>🧠 Math Puzzle</h2>
+      <p id="question"></p>
+      <input type="number" id="answer" placeholder="Your answer" />
+      <button onclick="checkMath()">Check</button>
+      <p id="mathResult"></p>
+    </div>
+
+    <!-- Tic Tac Toe -->
+    <div class="game-card">
+      <h2>❌ Tic Tac Toe ⭕</h2>
+      <table border="1" style="margin:auto;">
+        <tr><td onclick="move(this,0)"></td><td onclick="move(this,1)"></td><td onclick="move(this,2)"></td></tr>
+        <tr><td onclick="move(this,3)"></td><td onclick="move(this,4)"></td><td onclick="move(this,5)"></td></tr>
+        <tr><td onclick="move(this,6)"></td><td onclick="move(this,7)"></td><td onclick="move(this,8)"></td></tr>
+      </table>
+      <p id="tttResult"></p>
+    </div>
+
+    <!-- Rock Paper Scissors -->
+    <div class="game-card">
+      <h2>✊ Rock Paper ✌️</h2>
+      <button onclick="playRPS('rock')">Rock</button>
+      <button onclick="playRPS('paper')">Paper</button>
+      <button onclick="playRPS('scissors')">Scissors</button>
+      <p id="rpsResult"></p>
+    </div>
+
+    <!-- Gun Game -->
+    <div class="game-card">
+      <h2>🔫 Mini Gun Game</h2>
+      <canvas id="gunCanvas" width="200" height="200"></canvas>
+      <p id="gunScore">Score: 0</p>
+    </div>
+
+    <!-- Memory Puzzle -->
+    <div class="game-card">
+      <h2>🧩 Memory Puzzle</h2>
+      <button onclick="startMemory()">Start</button>
+      <div id="memoryBoard" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Math Puzzle
+    let a = Math.floor(Math.random() * 10);
+    let b = Math.floor(Math.random() * 10);
+    document.getElementById('question').innerText = `What is ${a} + ${b}?`;
+    function checkMath() {
+      let userAns = parseInt(document.getElementById('answer').value);
+      document.getElementById('mathResult').innerText = userAns === (a + b) ? "✅ Correct!" : "❌ Try again!";
+    }
+
+    // Tic Tac Toe
+    let board = Array(9).fill('');
+    function move(cell, index) {
+      if (board[index] === '') {
+        cell.innerText = 'X';
+        board[index] = 'X';
+        botMove();
+        checkWinner();
+      }
+    }
+    function botMove() {
+      let empty = board.map((v, i) => v === '' ? i : null).filter(i => i !== null);
+      let move = empty[Math.floor(Math.random() * empty.length)];
+      if (move !== undefined) {
+        document.querySelectorAll("td")[move].innerText = 'O';
+        board[move] = 'O';
+      }
+    }
+    function checkWinner() {
+      let lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      for (let [a,b,c] of lines) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          document.getElementById('tttResult').innerText = board[a] + " wins!";
+        }
+      }
+    }
+
+    // Rock Paper Scissors
+    function playRPS(user) {
+      let choices = ['rock', 'paper', 'scissors'];
+      let bot = choices[Math.floor(Math.random() * 3)];
+      let result = '';
+      if (user === bot) result = "😐 It's a tie!";
+      else if ((user === 'rock' && bot === 'scissors') || (user === 'scissors' && bot === 'paper') || (user === 'paper' && bot === 'rock'))
+        result = "✅ You win!";
+      else result = "🤖 Robot wins!";
+      document.getElementById('rpsResult').innerText = `Robot chose ${bot}. ${result}`;
+    }
+
+    // Gun Game
+    let canvas = document.getElementById("gunCanvas");
+    let ctx = canvas.getContext("2d");
+    let x = Math.random() * 180;
+    let y = Math.random() * 180;
+    let score = 0;
+    function drawTarget() {
+      ctx.clearRect(0, 0, 200, 200);
+      ctx.fillStyle = "red";
+      ctx.beginPath();
+      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    canvas.addEventListener("click", function(e) {
+      let rect = canvas.getBoundingClientRect();
+      let clickX = e.clientX - rect.left;
+      let clickY = e.clientY - rect.top;
+      if (Math.hypot(clickX - x, clickY - y) < 15) {
+        score++;
+        document.getElementById("gunScore").innerText = "Score: " + score;
+        x = Math.random() * 180;
+        y = Math.random() * 180;
+        drawTarget();
+      }
+    });
+    drawTarget();
+
+    // Memory Puzzle
+    function startMemory() {
+      let values = ['A','B','C','A','B','C'];
+      values.sort(() => 0.5 - Math.random());
+      let html = '';
+      values.forEach((val, i) => {
+        html += `<div onclick="flip(this, '${val}')" style="width:50px;height:50px;background:#999;margin:5px;text-align:center;line-height:50px;border-radius:10px;">?</div>`;
+      });
+      document.getElementById('memoryBoard').innerHTML = html;
+    }
+    let flipped = [];
+    function flip(el, val) {
+      if (flipped.length < 2 && el.innerText === '?') {
+        el.innerText = val;
+        flipped.push({el, val});
+        if (flipped.length === 2) {
+          setTimeout(() => {
+            if (flipped[0].val !== flipped[1].val) {
+              flipped[0].el.innerText = '?';
+              flipped[1].el.innerText = '?';
+            }
+            flipped = [];
+          }, 800);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎮 3D Mini Games vs Robot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(-45deg, #1a1a40, #1f4068, #162447, #1b1b2f);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      text-align: center;
+      padding: 25px;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: cyan;
+      text-shadow: 0 0 15px #0ff, 0 0 25px #0ff;
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .menu button {
+      padding: 15px 25px;
+      background: rgba(0, 255, 255, 0.1);
+      border: 2px solid cyan;
+      border-radius: 15px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0, 255, 255, 0.4);
+      backdrop-filter: blur(8px);
+      transition: 0.4s ease;
+      transform: perspective(600px) rotateX(10deg);
+    }
+
+    .menu button:hover {
+      transform: scale(1.1) rotateY(10deg);
+      background: rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 30px cyan, 0 0 60px #00ffff99;
+    }
+
+    .game-section {
+      display: none;
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #0ff;
+      border-radius: 20px;
+      box-shadow: 0 0 30px #0ff5, 0 0 60px #0ff2;
+      backdrop-filter: blur(12px);
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(30px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .visible {
+      display: block;
+    }
+
+    h2 {
+      font-size: 2rem;
+      text-shadow: 0 0 10px cyan;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <header>🎮 3D Mini Games vs Robot</header>
+
+  <div class="menu">
+    <button onclick="showGame('rps')">Rock Paper Scissors</button>
+    <button onclick="showGame('ttt')">Tic Tac Toe</button>
+    <button onclick="showGame('math')">Math Quiz</button>
+    <button onclick="showGame('puzzle')">Puzzle Game</button>
+    <button onclick="showGame('guess')">Guess the Number</button>
+    <button onclick="showGame('scramble')">Word Scramble</button>
+    <button onclick="showGame('gun')">Gun Target</button>
+    <button onclick="showGame('memory')">Memory Match</button>
+    <button onclick="showGame('click')">Reflex Click</button>
+    <button onclick="showGame('color')">Color Match</button>
+  </div>
+
+  <div id="game-container">
+    <div id="rps" class="game-section"><h2>🤖 Rock Paper Scissors</h2><p>Coming soon...</p></div>
+    <div id="ttt" class="game-section"><h2>⭕ Tic Tac Toe ❌</h2><p>Coming soon...</p></div>
+    <div id="math" class="game-section"><h2>📚 Math Quiz</h2><p>Coming soon...</p></div>
+    <div id="puzzle" class="game-section"><h2>🧩 Puzzle Game</h2><p>Coming soon...</p></div>
+    <div id="guess" class="game-section"><h2>🔢 Guess the Number</h2><p>Coming soon...</p></div>
+    <div id="scramble" class="game-section"><h2>🔀 Word Scramble</h2><p>Coming soon...</p></div>
+    <div id="gun" class="game-section"><h2>🔫 Mini Gun Target</h2><p>Coming soon...</p></div>
+    <div id="memory" class="game-section"><h2>🧠 Memory Match</h2><p>Coming soon...</p></div>
+    <div id="click" class="game-section"><h2>⚡ Quick Reflex Click</h2><p>Coming soon...</p></div>
+    <div id="color" class="game-section"><h2>🎨 Color Match</h2><p>Coming soon...</p></div>
+  </div>
+
+  <script>
+    function showGame(id) {
+      document.querySelectorAll('.game-section').forEach(section => {
+        section.classList.remove('visible');
+      });
+      document.getElementById(id).classList.add('visible');
+    }
+  </script>
+</body>
+</html>

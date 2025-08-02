@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌍 Global News - Live Updates</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 30px;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .title-3d {
+      text-align: center;
+      font-size: 4rem;
+      color: #ffcc00;
+      text-shadow:
+        0 1px 0 #ccc,
+        0 2px 0 #c9c9c9,
+        0 3px 0 #bbb,
+        0 4px 0 #b9b9b9,
+        0 5px 0 #aaa,
+        0 6px 1px rgba(0,0,0,.1),
+        0 0 5px rgba(0,0,0,.1),
+        0 1px 3px rgba(0,0,0,.3),
+        0 3px 5px rgba(0,0,0,.2),
+        0 5px 10px rgba(0,0,0,.25),
+        0 10px 10px rgba(0,0,0,.2),
+        0 20px 20px rgba(0,0,0,.15);
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow:
+          0 0 10px #ffcc00,
+          0 0 20px #ffcc00,
+          0 0 30px #ffaa00,
+          0 0 40px #ffaa00;
+      }
+      to {
+        text-shadow:
+          0 0 20px #ffcc00,
+          0 0 30px #ffaa00,
+          0 0 40px #ffaa00,
+          0 0 50px #ff8800;
+      }
+    }
+
+    h2 {
+      text-align: center;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 40px;
+    }
+
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .news-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 15px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease forwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .news-card:hover {
+      transform: scale(1.02);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .news-card a {
+      color: #ffcc00;
+      font-weight: bold;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+
+    .news-card p {
+      margin: 5px 0 0;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .glow-shake {
+      color: #ffcc00;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 1.2rem;
+      text-shadow: 0 0 10px #ffd700, 0 0 20px #ffcc00, 0 0 30px #ffff33;
+      display: inline-block;
+      animation: shakeGlow 2.5s infinite ease-in-out;
+    }
+
+    @keyframes shakeGlow {
+      0% { transform: translate(0px, 0px) rotate(0deg); }
+      25% { transform: translate(1px, -2px) rotate(-1deg); }
+      50% { transform: translate(-2px, 1px) rotate(1deg); }
+      75% { transform: translate(2px, 1px) rotate(0deg); }
+      100% { transform: translate(0px, 0px) rotate(-1deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="title-3d">🌍 NEWS</div>
+  <h2>100 Latest Global News</h2>
+
+  <div class="news-list" id="newsList">
+    <!-- News cards will be inserted by JS -->
+  </div>
+
+  <script>
+    const newsItems = [
+      "UN Discusses Urgent Climate Action at Global Summit",
+      "Tech Giants Launch Initiative to Fight Online Misinformation",
+      "Global Markets React to Rising Interest Rates",
+      "Breakthrough in Cancer Treatment Announced",
+      "NASA’s Mars Rover Sends New Images",
+      "India and Japan Sign Historic Tech Partnership",
+      "AI Breakthrough: Human-like Chatbot Released Globally",
+      "Earthquake Hits Chile, No Casualties Reported",
+      "Olympics 2028 Preparations Begin in Los Angeles",
+      "Massive Forest Fires Rage Across Southern Europe",
+      "Stock Markets Recover After Global Downturn",
+      "China Launches Next-Gen Space Telescope",
+      "Global Water Crisis Escalates, UN Warns",
+      "Tesla Unveils Affordable Electric Scooter",
+      "FIFA Approves New Rules Ahead of World Cup 2026",
+      "Google Announces Quantum Computing Breakthrough",
+      "Record Heatwave Hits North America",
+      "Bitcoin Surges to $80,000 Amid Market Frenzy",
+      "Scientists Clone Endangered Species Successfully",
+      "Major Cities Go Green: Banning Petrol Vehicles by 2030",
+      "Global Peace Talks Resume in Geneva",
+      "Meta Launches AI-Generated Social Worlds",
+      "Hurricane Lorenzo Approaching Florida Coast",
+      "Nobel Prize Winner Discovers New Planet",
+      "Amazon Introduces Drone Grocery Delivery",
+      "UK Unveils World’s Largest Solar Farm",
+      "Facebook to Integrate Neural Input Devices",
+      "Global Food Prices Decline After Stabilization",
+      "WHO Approves New Universal Flu Vaccine",
+      "South Korea Hosts Global Tech Olympics",
+      "France Bans Plastic Packaging Nationwide",
+      "NASA Tests New Lunar Habitat in Desert",
+      "Africa Launches First Continental 5G Network",
+      "Elon Musk Introduces Mind-Linked Cars",
+      "UN Launches Global Literacy Mission 2030"
+    ];
+
+    const newsList = document.getElementById("newsList");
+
+    newsItems.forEach((title, index) => {
+      const card = document.createElement("div");
+      card.className = "news-card";
+      card.style.setProperty("--delay", `${index * 0.15}s`);
+
+      card.innerHTML = `
+        <a href="https://news.google.com" target="_blank" class="glow-shake">${title}</a>
+        <p>August 2, 2025</p>
+      `;
+      newsList.appendChild(card);
+    });
+  </script>
+</body>
+</html>
+ <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: linear-gradient(to right, #000000, #001f3f);
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #00ffff;
+      text-shadow: 0 0 20px #00ffff;
+      text-align: left;
+      margin-top: 60px;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .news-list {
+      margin-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .news-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 18px 25px;
+      border-radius: 12px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 0 10px rgba(0,255,255,0.4);
+      animation: slideIn 0.5s ease forwards;
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: all 0.4s ease-in-out;
+    }
+
+    .news-card:hover {
+      transform: scale(1.02);
+      background: rgba(0, 255, 255, 0.1);
+    }
+
+    .glow-movie a {
+      font-size: 1.3rem;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+      font-weight: 600;
+      animation: shakeGlow 2s infinite alternate;
+      text-decoration: none;
+    }
+
+    .news-card p {
+      font-size: 0.95rem;
+      color: #aaa;
+      margin-top: 5px;
+    }
+
+    @keyframes shakeGlow {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(6px); }
+      100% { transform: translateX(-6px); }
+    }
+
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+       
+
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Example Section -->
+  <h1>🎬 Top 10 Latest Indian Movies</h1>
+  <div class="news-list">
+    <div class="news-card glow-movie"><a href="#">1. Kalki 2898 AD - Sci-fi Blockbuster Continues Box Office Reign</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">2. Pushpa 2 Trailer Hits 100M Views in 3 Days</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">3. Singham Again's New Teaser Leaves Fans Excited</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">4. Brahmastra Part 2 Shooting Begins in Varanasi</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">5. War 2 Posters Revealed – Hrithik vs Jr. NTR</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">6. Don 3 with Ranveer Singh Confirmed for 2025</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">7. Shaitaan 2 Announced – Horror Returns</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">8. Laal Salaam Streaming on Netflix Now</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">9. Bhool Bhulaiyaa 3 to Release Diwali 2025</a><p>August 2, 2025</p></div>
+    <div class="news-card glow-movie"><a href="#">10. Yodha Movie Gains Global Audience</a><p>August 2, 2025</p></div>
+  </div>
+
+  <!-- Repeat same structure for American, Chinese, Pakistani, and Global Movies below -->
+  <!-- You can paste the same <h1> and <div class="news-list">...</div> sections for each region -->
+
+</body>
+</html>
